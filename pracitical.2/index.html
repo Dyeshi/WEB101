@@ -5,14 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather API Dashboard</title>
-
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: white;
         }
 
         h1 {
@@ -43,10 +42,10 @@
         button {
             width: 100%;
             padding: 8px;
-            border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
         }
+
         button {
             background-color: #3498db;
             color: white;
@@ -59,10 +58,6 @@
 
         button:hover {
             background-color: #2980b9;
-        }
-
-        .weather-display {
-            margin-top: 20px;
         }
 
         .weather-card {
@@ -93,5 +88,167 @@
         .location-actions {
             display: flex;
             justify-content: space-between;
-            margin-top: 10px;
+            margin-top: 10px
         }
+
+        .btn-edit,
+        .btn-delete {
+            width: 48%;
+            padding: 5px;
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+
+        .response-info {
+            background-color: #eefaf7;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            background-color: #ddd;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Weather API Dashboard</h1>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="get">GET Weather</div>
+            <div class="tab" data-tab="post">POST Location</div>
+            <div class="tab" data-tab="saved">Saved Locations</div>
+            <div class="tab" data-tab="api-info">API Info</div>
+        </div>
+
+        <!-- GET -->
+        <div class="tab-content active" id="get-tab">
+            <h2>Get Current Weather (GET Request)</h2>
+            <div class="form-group">
+                <label for="city-input">City Name:</label>
+                <input type="text" id="city-input" placeholder="Enter city name (e.g, London)">
+            </div>
+            <!-- FIXED ID -->
+            <button id="get-weather">Get Weather</button>
+
+            <div class="weather-display" id="weather-result"></div>
+        </div>
+
+        <!-- POST -->
+        <div class="tab-content" id="post-tab">
+            <h2>Save Location (POST Request)</h2>
+            <div class="form-group">
+                <label for="location-name">Location Name:</label>
+                <input type="text" id="location-name" placeholder="Enter location name">
+            </div>
+
+            <div class="form-group">
+                <label for="location-city">City:</label>
+                <input type="text" id="location-city" placeholder="Enter city">
+            </div>
+
+            <div class="form-group">
+                <label for="location-country">Country:</label>
+                <input type="text" id="location-country" placeholder="Enter country code (e.g, US)">
+            </div>
+
+            <div class="form-group">
+                <label for="location-notes">Notes:</label>
+                <input type="text" id="location-notes" placeholder="Add optional notes">
+            </div>
+
+            <button id="save-location">Save Location</button>
+        </div>
+
+        <!-- SAVED -->
+        <div class="tab-content" id="saved-tab">
+            <h2>Saved Locations</h2>
+            <p>Manage your saved locations (PUT and DELETE requests)</p>
+            <div id="saved-locations" class="saved-locations"></div>
+        </div>
+
+        <!-- API INFO -->
+        <div class="tab-content" id="api-info-tab">
+            <h2>API Information</h2>
+            <ul>
+                <li><strong>GET</strong> - Retrieves weather data</li>
+                <li><strong>POST</strong> - Saves a location</li>
+                <li><strong>PUT</strong> - Updates a location</li>
+                <li><strong>DELETE</strong> - Deletes a location</li>
+            </ul>
+
+            <div id="response-info" class="response-info">No requests made yet.</div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL FIXED -->
+    <div id="edit-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 100;">
+        <div style="background-color: white; margin: 10% auto; padding: 20px; width: 80%; max-width: 500px;border-radius: 8px;">
+            <h3>Edit Location</h3>
+
+            <div class="form-group">
+                <label for="edit-name">Location Name:</label>
+                <input type="text" id="edit-name">
+            </div>
+
+            <div class="form-group">
+                <label for="edit-city">City:</label>
+                <input type="text" id="edit-city">
+            </div>
+
+            <div class="form-group">
+                <label for="edit-country">Country:</label>
+                <input type="text" id="edit-country">
+            </div>
+
+            <div class="form-group">
+                <label for="edit-notes">Notes:</label>
+                <input type="text" id="edit-notes">
+            </div>
+
+            <input type="hidden" id="edit-id">
+
+            <div style="display: flex; justify-content: space-between;">
+                <button id="update-location" style="width: 48%;">Update</button>
+                <button id="cancel-edit" style="width: 48%; background-color: #95a5a6;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
